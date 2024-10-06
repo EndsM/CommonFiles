@@ -43,11 +43,25 @@ class RepackHoiMod:
             shutil.copy2(descriptorFile, copiedToPath)
 
     def deleteDevelopmentFilesFromOutput(self, extensionsToDelete: tuple[str]) -> bool:
-        files = os.listdir(self.resultDirectory)
-        for file in files:
-            if file.endswith(extensionsToDelete):
-                filePath = os.path.join(self.resultDirectory, file)
-                os.remove(filePath)
+        deleted_files = []
+        for root, dirs, files in os.walk(self.resultDirectory, topdown=False):
+            for file in files:
+                if file.endswith(extensionsToDelete):
+                    file_path = os.path.join(root, file)
+                    try:
+                        os.remove(file_path)
+                        deleted_files.append(file_path)
+                    except Exception as e:
+                        print(f"Error deleting {file_path}: {e}")
+
+        if deleted_files:
+            print(f"Deleted {len(deleted_files)} development files:")
+            for file in deleted_files:
+                print(f" - {file}")
+            return True
+        else:
+            print("No development files found to delete.")
+            return False
 
     def deleteDevelopmentFoldersFromOutput(self, folderNames) -> bool:
         folders = os.listdir(self.resultDirectory)
@@ -87,6 +101,6 @@ program.readProjectNameFromDescriptor()
 program.createCopy()
 program.createModInfo()
 # delete development files that not suitable for release
-fileExtensionsToDelete = (".exe", ".py", ".gitignore",".gitattributes")
+fileExtensionsToDelete = (".exe", ".py", ".gitignore", ".gitattributes")
 program.deleteDevelopmentFilesFromOutput(fileExtensionsToDelete)
 program.deleteDevelopmentFoldersFromOutput([".vscode", ".git"])
