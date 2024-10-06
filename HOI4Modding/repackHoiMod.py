@@ -78,7 +78,7 @@ class RepackHoiMod:
         if os.path.exists("descriptor.mod"):
             with open("descriptor.mod", "r") as f:
                 descriptorContent = f.read()
-                match = re.search(r'name\s*=\s*"([^"]+)""', descriptorContent)
+                match = re.search(r'name\s*=\s*"([^"]+)"', descriptorContent)
                 if match:
                     self.currentProjectName = match.group(1)
                     self.resultDirectory = os.path.join(
